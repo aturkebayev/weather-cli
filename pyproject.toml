@@ -13,3 +13,9 @@ dependencies = [
 
 [project.scripts]
 weather = "main:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --tb=short"
