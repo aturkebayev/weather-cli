@@ -14,12 +14,21 @@ from datetime import datetime
 load_dotenv()
 
 def main():
-    parser = argparse.ArgumentParser(description="Проверить погоду в городе")
-    parser.add_argument("city", help="Название города (на русском или английском)")
-    parser.add_argument("--history", action="store_true", help="Показать последние запросы")
-    
-    args = parser.parse_args()
-    
+    print("Выберите действие")
+    ##parser = argparse.ArgumentParser(description="Выберите действие")
+    ##parser.add_argument("getaction", help = "weather для погоды и history для просмотра истории запросов")
+        
+    args = input("weather для погоды и history для просмотра истории запросов: ")
+
+    getHistory = 0
+
+    if args == "weather":
+        city = input("Введите название города: ")
+    elif args == "history":
+        getHistory = 1
+    else:
+        exit
+
     api_key = os.getenv('OPENWEATHER_API_KEY')
     if not api_key:
         print("❌ Ошибка: OPENWEATHER_API_KEY не найден в .env")
@@ -28,14 +37,15 @@ def main():
     weather_api = WeatherAPI(api_key)
     history = HistoryManager(os.getenv('HISTORY_FILE', 'weather_history.json'))
     
-    if args.history:
+    if getHistory==1:
         print("\n📋 Последние 5 запросов:")
-        for entry in history.get_last_5():
-            print(f"  {entry['city']}: {entry['temp']}°C")
+        for entry in history.get_last_5(): 
+            timestamp = datetime.fromisoformat(entry['timestamp'])
+            print(f"  ", timestamp.strftime("%Y-%m-%d"), entry['city'],":", entry['temp'],"°C")
         return
     
     # Получить погоду
-    weather = weather_api.get_weather(args.city)
+    weather = weather_api.get_weather(city)
     if not weather:
         print(f"❌ Не удалось получить погоду для {args.city}")
         sys.exit(1)
